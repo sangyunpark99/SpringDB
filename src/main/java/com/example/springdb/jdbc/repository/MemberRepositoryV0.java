@@ -36,6 +36,26 @@ public class MemberRepositoryV0 {
         }
     }
 
+    public void update(String memberId, int money) throws SQLException {
+        String sql = "update member set money=? where member_id=? ";
+
+        Connection con = null;
+        PreparedStatement pstmt = null;
+
+        try {
+            con = getConnection();
+            pstmt = con.prepareStatement(sql);
+            pstmt.setInt(1, money);
+            pstmt.setString(2, memberId);
+            int resultSize = pstmt.executeUpdate();
+            System.out.println(resultSize);
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(con, pstmt, null);
+        }
+    }
+
     public Member findById(String memberId) throws SQLException {
         String sql = "select * from member where member_id = ?";
 
@@ -62,8 +82,28 @@ public class MemberRepositoryV0 {
         } catch (SQLException e) {
             log.error("db error", e);
             throw e;
-        } finally { // 리소스 자원 낭비 최소화
+        } finally { // 리소스 자원 낭비 최소ㅔㅕ
             close(con,pstmt,rs);
+        }
+    }
+
+    public void delete(String memberId) throws SQLException {
+        String sql = "delete from member where member_id=?";
+
+        Connection con = null;
+        PreparedStatement pstmt = null;
+
+        try{
+            con = getConnection();
+            pstmt = con.prepareStatement(sql);
+            pstmt.setString(1, memberId);
+            pstmt.executeUpdate();
+
+        }catch (SQLException e) {
+            log.error("db error", e);
+            throw e;
+        }finally {
+            close(con, pstmt, null);
         }
     }
 

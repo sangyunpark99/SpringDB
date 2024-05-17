@@ -1,10 +1,8 @@
 package com.example.springdb.jdbc.domain;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class Member {
     private String memberId;
     private int money;
