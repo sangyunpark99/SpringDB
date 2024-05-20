@@ -46,9 +46,9 @@ public class ConnectionTest {
     }
 
     public static void main(String[] args) throws SQLException, InterruptedException {
-        driverManager();
-        System.out.println();
-        dataSourceDriverManger();
+        //driverManager();
+        //System.out.println();
+        //dataSourceDriverManger();
         dataSourceConnectionPool();
     }
 }
