@@ -123,7 +123,7 @@ public class MemberRepositoryV1 {
         JdbcUtils.closeConnection(con);
     }
 
-    private Connection getConnection() throws SQLException {
+    private Connection getConnection() throws SQLException { // dataSource에서 커넥션 획득
         Connection con = dataSource.getConnection();
         log.info("get conneciton={}, class={}", con, con.getClass());
 

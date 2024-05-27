@@ -7,10 +7,8 @@ import com.example.springdb.jdbc.repository.MemberRepositoryV1;
 import com.zaxxer.hikari.HikariDataSource;
 import java.sql.SQLException;
 import java.util.NoSuchElementException;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 public class MemberRepositoryV1Test {
 
@@ -21,10 +19,11 @@ public class MemberRepositoryV1Test {
 
     @BeforeEach
     void beforeEach() throws Exception {
-        // 기본 DriverManger - 항상 새로운 커넥션 획득
+        // 기본 DriverManger - 항상 새로운 커넥션 획득 >> 성능이 느리다.
         // DriverManagerDataSource dataSource = new DriverManagerDataSource(URL, USERNAME, PASSWORD);
 
-        // 커넥션 풀링: HikariProxyConnection -> JdbcConnection
+        // 커넥션 풀링: HikariProxyConnection -> JdbcConnection >> 재사용 한다.
+        // conn0번을 꺼냈다가 반환하고, 꺼냈다가 반환하게 된다.
         HikariDataSource dataSource = new HikariDataSource();
         dataSource.setJdbcUrl(URL);
         dataSource.setUsername(USERNAME);
@@ -50,5 +49,7 @@ public class MemberRepositoryV1Test {
         repository.delete(member.getMemberId());
         assertThatThrownBy(() -> repository.findById(member.getMemberId()))
                 .isInstanceOf(NoSuchElementException.class);
+
+        Thread.sleep(1000);
     }
 }
