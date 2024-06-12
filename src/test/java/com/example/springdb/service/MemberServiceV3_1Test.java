@@ -1,36 +1,47 @@
 package com.example.springdb.service;
 
-import static com.example.springdb.jdbc.ConnectionConst.*;
-import static org.assertj.core.api.Assertions.*;
+import static com.example.springdb.jdbc.ConnectionConst.PASSWORD;
+import static com.example.springdb.jdbc.ConnectionConst.URL;
+import static com.example.springdb.jdbc.ConnectionConst.USERNAME;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.example.springdb.jdbc.domain.Member;
-import com.example.springdb.jdbc.repository.MemberRepositoryV1;
-import com.example.springdb.jdbc.service.MemberServiceV1;
+import com.example.springdb.jdbc.repository.MemberRepositoryV2;
+import com.example.springdb.jdbc.repository.MemberRepositoryV3;
+import com.example.springdb.jdbc.service.MemberServiceV2;
+import com.example.springdb.jdbc.service.MemberServiceV3_1;
 import java.sql.SQLException;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.transaction.PlatformTransactionManager;
 
 /**
- * 기본 동작, 트랜잭션이 없어서 문제 발생
+ * 트랜잭션 - 커넥션 파라미터 전달 방식 동기화
  */
-class MemberServiceV1Test {
+@Slf4j
+public class MemberServiceV3_1Test {
 
     public static final String MEMBER_A = "memberA";
     public static final String MEMBER_B = "memberB";
     public static final String MEMBER_EX = "ex";
 
-
-    private MemberRepositoryV1 memberRepository;
-    private MemberServiceV1 memberService;
+    private MemberRepositoryV3 memberRepository;
+    private MemberServiceV3_1 memberService;
 
     @BeforeEach
     void before() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource(URL, USERNAME, PASSWORD);
-        memberRepository = new MemberRepositoryV1(dataSource);
-        memberService = new MemberServiceV1(memberRepository);
+        memberRepository = new MemberRepositoryV3(dataSource);
+
+        PlatformTransactionManager transactionManager = new DataSourceTransactionManager(dataSource);
+
+        memberService = new MemberServiceV3_1(memberRepository,transactionManager);
     }
 
     @AfterEach
@@ -50,7 +61,9 @@ class MemberServiceV1Test {
         memberRepository.save(memberB);
 
         // when
+        log.info("START TX");
         memberService.accountTransfer(memberA.getMemberId(), memberB.getMemberId(), 2000);
+        log.info("END TX");
 
         // then
         Member findMemberA = memberRepository.findById(memberA.getMemberId());
@@ -78,8 +91,8 @@ class MemberServiceV1Test {
         Member findMemberA = memberRepository.findById(memberA.getMemberId());
         Member findMemberB = memberRepository.findById(memberEx.getMemberId());
 
-        // memberA의 돈만 2000원 줄었고, ex의 돈은 10000원 그대로이다.
-        assertThat(findMemberA.getMoney()).isEqualTo(8000);
+        // transaction으로 인해 원상 복구 되었다.
+        assertThat(findMemberA.getMoney()).isEqualTo(10000);
         assertThat(findMemberB.getMoney()).isEqualTo(10000);
     }
 }
