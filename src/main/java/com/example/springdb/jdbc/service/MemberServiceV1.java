@@ -16,7 +16,7 @@ public class MemberServiceV1 {
         Member toMember = memberRepository.findById(toId);
 
         memberRepository.update(fromId, fromMember.getMoney() - money); // 돈 보내는 사람
-        //validation(toMember);
+        validation(toMember);
         memberRepository.update(toId, toMember.getMoney() + money); // 돈 받는 사람
     }
 

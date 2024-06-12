@@ -11,15 +11,11 @@ import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.support.JdbcUtils;
 
-/**
- * JDBC - DataSource 사용, JdbcUtils 사용
- */
 @Slf4j
-public class MemberRepositoryV1 {
-
+public class MemberRepositoryV2 {
     private final DataSource dataSource;
 
-    public MemberRepositoryV1(DataSource dataSource) {
+    public MemberRepositoryV2(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
@@ -72,7 +68,6 @@ public class MemberRepositoryV1 {
         PreparedStatement pstmt = null;
 
         try {
-            con = getConnection();
             pstmt = con.prepareStatement(sql);
             pstmt.setInt(1, money);
             pstmt.setString(2, memberId);
@@ -180,4 +175,4 @@ public class MemberRepositoryV1 {
 
         return con;
     }
- }
+}
